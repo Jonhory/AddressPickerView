@@ -11,9 +11,11 @@
     * [AddressPickerView.h](#AddressPickerView.h)
     * [Province.h](#Province.h)
     * [City.h](#City.h)
-    
 * Examples
     * [Reference[参考]](#参考)
+* Attention
+    * [注意](#注意)
+
 
 ## <a id="如何使用"></a>如何使用
 * 手动导入
@@ -107,7 +109,7 @@
                            areas:(NSArray *)areas;
 
 
-## <a id="参考"></a>参考
+## <a id="参考"></a>使用参考
 
     @property (nonatomic ,strong) AddressPickerView * pickerView;
     
@@ -126,3 +128,11 @@
         }
         return _pickerView;
     }
+
+## <a id="注意"></a>注意
+* 使用的模型类名`Province、City`很常见，如果您的项目中有重名，请自行修改本项目中使用的类名，我不加前缀是因为我不喜欢- - 。
+
+
+
+## <a id="关于我"></a>关于我
+ * 如果在使用过程中遇到问题，或者想要与我分享<jonhory@163.com>
