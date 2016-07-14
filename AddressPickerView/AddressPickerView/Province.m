@@ -12,7 +12,8 @@
 @implementation Province
 
 // 成员方法创建
-- (instancetype)initWithName:(NSString *)name cities:(NSArray *)cities
+- (instancetype)initWithName:(NSString *)name
+                      cities:(NSArray *)cities
 {
     if (self = [super init]) {
         _name = name;
@@ -23,8 +24,10 @@
 }
 
 // 类方法创建
-+ (instancetype)provinceWithName:(NSString *)name cities:(NSArray *)cities{
-    Province *p = [[Province alloc] initWithName:name cities:cities];
++ (instancetype)provinceWithName:(NSString *)name
+                          cities:(NSArray *)cities{
+    Province *p = [[Province alloc] initWithName:name
+                                          cities:cities];
     return p;
 }
 

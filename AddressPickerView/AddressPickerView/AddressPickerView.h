@@ -10,9 +10,7 @@
 
 @protocol AddressPickerViewDelegate <NSObject>
 
-/**
- *  取消按钮点击事件
- */
+/** 取消按钮点击事件*/
 - (void)cancelBtnClick;
 
 /**
@@ -22,12 +20,15 @@
  *  @param city     当前选中的市
  *  @param area     当前选中的区
  */
-- (void)sureBtnClickReturnProvince:(NSString *)province City:(NSString *)city Area:(NSString *)area;
+- (void)sureBtnClickReturnProvince:(NSString *)province
+                              City:(NSString *)city
+                              Area:(NSString *)area;
 
 @end
 
 @interface AddressPickerView : UIView
 
-@property (nonatomic ,weak) id<AddressPickerViewDelegate> delegate;/**< 实现点击按钮代理*/
+/** 实现点击按钮代理*/
+@property (nonatomic ,weak) id<AddressPickerViewDelegate> delegate;
 
 @end

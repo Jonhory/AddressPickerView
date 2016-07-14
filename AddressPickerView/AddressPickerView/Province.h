@@ -24,7 +24,8 @@
  *
  *  @return 初始化省份
  */
-- (instancetype)initWithName:(NSString *)name cities:(NSArray *)cities;
+- (instancetype)initWithName:(NSString *)name
+                      cities:(NSArray *)cities;
 
 /**
  *  初始化省份
@@ -34,7 +35,8 @@
  *
  *  @return 初始化省份
  */
-+ (instancetype)provinceWithName:(NSString *)name cities:(NSArray *)cities;
++ (instancetype)provinceWithName:(NSString *)name
+                          cities:(NSArray *)cities;
 
 
 

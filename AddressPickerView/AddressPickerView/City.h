@@ -23,7 +23,8 @@
  *
  *  @return 初始化城市
  */
-- (instancetype)initWithName:(NSString *)name areas:(NSArray *)areas;
+- (instancetype)initWithName:(NSString *)name
+                       areas:(NSArray *)areas;
 
 /**
  *  初始化城市
@@ -33,7 +34,8 @@
  *
  *  @return 初始化城市
  */
-+ (instancetype)cityWithName:(NSString *)cityName areas:(NSArray *)areas;
++ (instancetype)cityWithName:(NSString *)cityName
+                       areas:(NSArray *)areas;
 
 
 @end
