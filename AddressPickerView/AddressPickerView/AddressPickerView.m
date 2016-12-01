@@ -15,7 +15,7 @@
 @property (nonatomic ,strong) UIButton * cancelBtn;/**< 取消按钮*/
 @property (nonatomic, strong) UIButton * sureBtn;/**< 完成按钮*/
 
-@property (nonatomic ,strong) UIPickerView   * addressPickerView;/*< 选择器*/
+@property (nonatomic ,strong) UIPickerView   * addressPickerView;/**< 选择器*/
 
 @property (nonatomic ,strong) NSMutableArray * pArr;/**< 地址选择器数据源,装省份模型,每个省份模型内包含城市模型*/
 
