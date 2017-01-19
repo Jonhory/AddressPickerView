@@ -31,4 +31,7 @@
 /** 实现点击按钮代理*/
 @property (nonatomic ,weak) id<AddressPickerViewDelegate> delegate;
 
+- (void)show;
+- (void)hide;
+
 @end

@@ -289,6 +289,37 @@ numberOfRowsInComponent:(NSInteger)component{
     }
 }
 
+- (void)show{
+    [self showOrHide:YES];
+}
+
+- (void)hide{
+    [self showOrHide:NO];
+}
+
+- (void)showOrHide:(BOOL)isShow{
+    
+    CGFloat selfY = self.frame.origin.y;
+    __block CGFloat selfkY = selfY;
+    [UIView animateWithDuration:0.5 animations:^{
+        
+        [UIView beginAnimations:@"move" context:nil];
+        [UIView setAnimationDuration:0.75];
+        [UIView setAnimationDelegate:self];
+        //改变它的frame的x,y的值
+        
+        if (isShow) {
+            selfkY = [UIScreen mainScreen].bounds.size.height - 215;
+        }
+        else {
+            selfkY = [UIScreen mainScreen].bounds.size.height;
+        }
+        self.frame = CGRectMake(0,selfkY, self.bounds.size.width,215);
+
+        [UIView commitAnimations];
+    }];
+}
+
 - (void)sureBtnClicked{
     if ([_delegate respondsToSelector:@selector(sureBtnClickReturnProvince:City:Area:)]) {
         NSInteger selectProvince = [self.addressPickerView selectedRowInComponent:0];

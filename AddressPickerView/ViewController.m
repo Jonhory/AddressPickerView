@@ -64,23 +64,12 @@
 }
 
 - (void)btnClick:(UIButton *)btn{
-    [UIView animateWithDuration:0.5 animations:^{
-        
-        [UIView beginAnimations:@"move" context:nil];
-        [UIView setAnimationDuration:0.75];
-        [UIView setAnimationDelegate:self];
-        //改变它的frame的x,y的值
-        if (btn.selected) {
-            _pickerView.frame = CGRectMake(0, SCREEN.height, SCREEN.width, 215);
-        }
-        else {
-            _pickerView.frame=CGRectMake(0,SCREEN.height - 215, SCREEN.width,215);
-        }
-        [UIView commitAnimations];
-        
-        btn.selected = !btn.selected;
-        
-    }];
+    btn.selected = !btn.selected;
+    if (btn.selected) {
+        [self.pickerView show];
+    }else{
+        [self.pickerView hide];
+    }
 }
 
 #pragma mark - AddressPickerViewDelegate 
