@@ -9,6 +9,10 @@
 #import "AddressPickerView.h"
 #import "Province.h"
 
+#define AddressProvinceIdxName @"AddressSelectProvince"
+#define AddressCityIdxName @"AddressSelectCity"
+#define AddressAreaIdxName @"AddressSelectArea"
+
 @interface AddressPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
 
 @property (nonatomic ,strong) UIView   * titleBackgroundView;/**< 标题栏背景*/
@@ -37,6 +41,8 @@
         [self loadTitle];
         //加载选择器
         [self loadPickerView];
+        // 默认支持自动打开上次结果
+        self.isAutoOpenLast = YES;
     }
     return self;
 }
@@ -107,6 +113,23 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
 #pragma mark  加载PickerView
 - (void)loadPickerView{
     [self addSubview:self.addressPickerView];
+}
+
+#pragma mark - 自动选择上次的结果
+- (void)setIsAutoOpenLast:(BOOL)isAutoOpenLast {
+    _isAutoOpenLast = isAutoOpenLast;
+    if (isAutoOpenLast) {
+        __weak __typeof(self)weakSelf = self;
+        [self getIdx:^(NSInteger p, NSInteger c, NSInteger a) {
+            [weakSelf.addressPickerView selectRow:p inComponent:0 animated:NO];
+            [weakSelf.addressPickerView selectRow:c inComponent:1 animated:NO];
+            [weakSelf.addressPickerView selectRow:a inComponent:2 animated:NO];
+        }];
+    } else {
+        [self.addressPickerView selectRow:0 inComponent:0 animated:NO];
+        [self.addressPickerView selectRow:0 inComponent:1 animated:NO];
+        [self.addressPickerView selectRow:0 inComponent:2 animated:NO];
+    }
 }
 
 #pragma mark - 加载地址数据
@@ -337,13 +360,33 @@ numberOfRowsInComponent:(NSInteger)component{
         if (selectArea > c.areas.count - 1) {
             selectArea = c.areas.count - 1;
         }
+        
+        if (self.isAutoOpenLast) {
+            [self setProvinceIdx:selectProvince cityIdx:selectCity areaIdx:selectArea];
+        }
+        
         [_delegate sureBtnClickReturnProvince:p.name
                                          City:c.cityName
                                          Area:c.areas[selectArea]];
     }
 }
 
+- (void)setProvinceIdx:(NSInteger)p cityIdx:(NSInteger)c areaIdx:(NSInteger)a {
+    [[NSUserDefaults standardUserDefaults] setValue:@(p+1) forKey:AddressProvinceIdxName];
+    [[NSUserDefaults standardUserDefaults] setValue:@(c+1) forKey:AddressCityIdxName];
+    [[NSUserDefaults standardUserDefaults] setValue:@(a+1) forKey:AddressAreaIdxName];
+}
 
+typedef void(^lastIdxBlock)(NSInteger p, NSInteger c, NSInteger a);
+- (void)getIdx:(lastIdxBlock)block {
+    NSNumber *p = [[NSUserDefaults standardUserDefaults] valueForKey:AddressProvinceIdxName];
+    NSNumber *c = [[NSUserDefaults standardUserDefaults] valueForKey:AddressCityIdxName];
+    NSNumber *a = [[NSUserDefaults standardUserDefaults] valueForKey:AddressAreaIdxName];
+    
+    if (p.integerValue && c.integerValue && a.integerValue) {
+        block(p.integerValue - 1, c.integerValue - 1, a.integerValue - 1);
+    }
+}
 
 
 

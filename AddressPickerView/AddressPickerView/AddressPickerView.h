@@ -28,6 +28,11 @@
 
 @interface AddressPickerView : UIView
 
+/**
+ 是否自动打开上次结果，默认为YES。
+ */
+@property (nonatomic, assign) BOOL isAutoOpenLast;
+
 /** 实现点击按钮代理*/
 @property (nonatomic ,weak) id<AddressPickerViewDelegate> delegate;
 
