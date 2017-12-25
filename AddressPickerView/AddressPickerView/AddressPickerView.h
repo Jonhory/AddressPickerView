@@ -28,6 +28,14 @@
 
 @interface AddressPickerView : UIView
 
+@property(nonatomic, copy) UIColor *backMaskColor;
+@property(nonatomic, copy) UIColor *titleViewColor;
+@property(nonatomic, copy) UIColor *titleColor;
+@property(nonatomic, copy) UIColor *pickerViewColor;
+@property(nonatomic, assign) CGFloat backMaskAlpha;
+
+- (void)setTitleHeight:(CGFloat)titleHeight pickerViewHeight:(CGFloat)pickerHeight;
+
 /**
  是否自动打开上次结果，默认为YES。
  */
@@ -37,6 +45,8 @@
 @property (nonatomic ,weak) id<AddressPickerViewDelegate> delegate;
 
 - (void)show;
+- (void)show:(BOOL)animation;
 - (void)hide;
+- (void)hide:(BOOL)animation;
 
 @end

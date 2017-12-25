@@ -12,8 +12,17 @@
 #define AddressProvinceIdxName @"AddressSelectProvince"
 #define AddressCityIdxName @"AddressSelectCity"
 #define AddressAreaIdxName @"AddressSelectArea"
+#define SELFSIZE self.bounds.size
+#define AD_SCREEN [UIScreen mainScreen].bounds.size
+#define AD_iPhoneX ([UIScreen mainScreen].bounds.size.width == 375.f && [UIScreen mainScreen].bounds.size.height == 812.f ? YES : NO)
+
+static CGFloat TITLEHEIGHT = 50.0;// 标题栏高度
+static CGFloat TITLEBUTTONWIDTH = 75.0;// 按钮宽度
+static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 
 @interface AddressPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
+
+@property(nonatomic, strong) UIButton *backgroundBtn;/**< 背景点击消失*/
 
 @property (nonatomic ,strong) UIView   * titleBackgroundView;/**< 标题栏背景*/
 @property (nonatomic ,strong) UIButton * cancelBtn;/**< 取消按钮*/
@@ -28,34 +37,110 @@
 @property (nonatomic ,strong) NSDictionary   * citysDict;/**< 所有城市的字典*/
 @property (nonatomic ,strong) NSDictionary   * areasDict;/**< 所有地区的字典*/
 
+@property(nonatomic, strong) UIView *maskingView;
 
 @end
 @implementation AddressPickerView
 
 - (instancetype)initWithFrame:(CGRect)frame{
+    if (frame.size.height == 0 && frame.size.width == 0) {
+        frame = CGRectMake(0, 0, AD_SCREEN.width, AD_SCREEN.height);
+    }
     self = [super initWithFrame:frame];
     if (self) {
         //加载地址数据源
         [self loadAddressData];
-        //加载标题栏
-        [self loadTitle];
-        //加载选择器
-        [self loadPickerView];
         // 默认支持自动打开上次结果
         self.isAutoOpenLast = YES;
+        self.userInteractionEnabled = NO;
     }
     return self;
 }
 
-#define SELFSIZE self.bounds.size
-static CGFloat const TITLEHEIGHT = 50.0;
-static CGFloat const TITLEBUTTONWIDTH = 75.0;
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        return [self initWithFrame:CGRectZero];
+    }
+    return self;
+}
+
+- (void)loadUI {
+    [self loadBackgroundBtn];
+    //加载标题栏
+    [self loadTitle];
+    //加载选择器
+    [self loadPickerView];
+    if (AD_iPhoneX) {
+        [self addSubview:self.maskingView];
+        self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
+    }
+}
+
+- (UIColor *)backMaskColor {
+    if (!_backMaskColor) {
+        _backMaskColor = [UIColor clearColor];
+    }
+    return _backMaskColor;
+}
+
+- (UIColor *)titleViewColor {
+    if (!_titleViewColor) {
+        _titleViewColor = [UIColor whiteColor];
+    }
+    return _titleViewColor;
+}
+
+- (UIColor *)titleColor {
+    if (!_titleColor) {
+        _titleColor = [UIColor blueColor];
+    }
+    return _titleColor;
+}
+
+- (UIColor *)pickerViewColor {
+    if (!_pickerViewColor) {
+        _pickerViewColor = [UIColor colorWithRed:239/255.f
+                                           green:239/255.f
+                                            blue:244.0/255.f
+                                           alpha:1.0];
+    }
+    return _pickerViewColor;
+}
+
+- (CGFloat)backMaskAlpha {
+    if (!_backMaskAlpha) {
+        _backMaskAlpha = 0.1;
+    }
+    return _backMaskAlpha;
+}
+
+- (UIView *)maskingView {
+    if (!_maskingView) {
+        _maskingView = [[UIView alloc]initWithFrame:CGRectZero];
+        _maskingView.backgroundColor = self.addressPickerView.backgroundColor;
+    }
+    return _maskingView;
+}
+
+- (UIButton *)backgroundBtn {
+    if (!_backgroundBtn) {
+        _backgroundBtn = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, AD_SCREEN.width, AD_SCREEN.height)];
+        _backgroundBtn.backgroundColor = self.backMaskColor;
+        _backgroundBtn.alpha = self.backMaskAlpha;
+        [_backgroundBtn addTarget:self
+                       action:@selector(cancelBtnClicked)
+             forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _backgroundBtn;
+}
 
 - (UIView *)titleBackgroundView{
     if (!_titleBackgroundView) {
         _titleBackgroundView = [[UIView alloc]initWithFrame:
-                                CGRectMake(0, 0, SELFSIZE.width, TITLEHEIGHT)];
-        _titleBackgroundView.backgroundColor = [UIColor whiteColor];
+                                CGRectMake(0, AD_SCREEN.height, SELFSIZE.width, TITLEHEIGHT)];
+        _titleBackgroundView.backgroundColor = self.titleViewColor;
     }
     return _titleBackgroundView;
 }
@@ -66,7 +151,7 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
                       CGRectMake(0, 0, TITLEBUTTONWIDTH, TITLEHEIGHT)];
         [_cancelBtn setTitle:@"取消"
                     forState:UIControlStateNormal];
-        [_cancelBtn setTitleColor:[UIColor blueColor]
+        [_cancelBtn setTitleColor:self.titleColor
                          forState:UIControlStateNormal];
         [_cancelBtn addTarget:self
                        action:@selector(cancelBtnClicked)
@@ -81,7 +166,7 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
                     CGRectMake(SELFSIZE.width - TITLEBUTTONWIDTH, 0, TITLEBUTTONWIDTH, TITLEHEIGHT)];
         [_sureBtn setTitle:@"完成"
                   forState:UIControlStateNormal];
-        [_sureBtn setTitleColor:[UIColor blueColor]
+        [_sureBtn setTitleColor:self.titleColor
                        forState:UIControlStateNormal];
         [_sureBtn addTarget:self
                      action:@selector(sureBtnClicked)
@@ -89,18 +174,20 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
     }
     return _sureBtn;
 }
+
 - (UIPickerView *)addressPickerView{
     if (!_addressPickerView) {
         _addressPickerView = [[UIPickerView alloc]initWithFrame:
-                              CGRectMake(0, TITLEHEIGHT, SELFSIZE.width, 165)];
-        _addressPickerView.backgroundColor = [UIColor colorWithRed:239/255.f
-                                                             green:239/255.f
-                                                              blue:244.0/255.f
-                                                             alpha:1.0];
+                              CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, SELFSIZE.width, CONTENTHEIGHT - TITLEHEIGHT)];
+        _addressPickerView.backgroundColor = self.pickerViewColor;
         _addressPickerView.delegate = self;
         _addressPickerView.dataSource = self;
     }
     return _addressPickerView;
+}
+
+- (void)loadBackgroundBtn {
+    [self addSubview:self.backgroundBtn];
 }
 
 #pragma mark - 加载标题栏
@@ -312,17 +399,51 @@ numberOfRowsInComponent:(NSInteger)component{
     }
 }
 
-- (void)show{
-    [self showOrHide:YES];
+- (void)setTitleHeight:(CGFloat)titleHeight pickerViewHeight:(CGFloat)pickerHeight {
+    TITLEHEIGHT = titleHeight;
+    CONTENTHEIGHT = titleHeight + pickerHeight;
 }
 
-- (void)hide{
-    [self showOrHide:NO];
+- (void)show {
+    [self show:YES];
 }
 
-- (void)showOrHide:(BOOL)isShow{
+- (void)hide {
+    [self hide:YES];
+}
+
+- (void)show:(BOOL)animation{
+    [self showOrHide:YES animation:animation];
+}
+
+- (void)hide:(BOOL)animation{
+    [self showOrHide:NO animation:animation];
+}
+
+- (void)showOrHide:(BOOL)isShow animation:(BOOL)animation{
+    [self loadUI];
+    self.userInteractionEnabled = isShow;
     
     CGFloat selfY = self.frame.origin.y;
+    if (!animation) {
+        if (isShow) {
+            self.backgroundBtn.hidden = NO;
+            selfY = AD_SCREEN.height - CONTENTHEIGHT - TITLEHEIGHT;
+            if (AD_iPhoneX) {
+                selfY -= 34.0f;
+            }
+        }
+        else {
+            self.backgroundBtn.hidden = YES;
+            selfY = AD_SCREEN.height;
+        }
+        self.titleBackgroundView.frame = CGRectMake(0,selfY, self.bounds.size.width,TITLEHEIGHT);
+        self.addressPickerView.frame = CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, AD_SCREEN.width, CONTENTHEIGHT - TITLEHEIGHT);
+        if (AD_iPhoneX) {
+            self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
+        }
+        return;
+    }
     __block CGFloat selfkY = selfY;
     [UIView animateWithDuration:0.5 animations:^{
         
@@ -332,13 +453,21 @@ numberOfRowsInComponent:(NSInteger)component{
         //改变它的frame的x,y的值
         
         if (isShow) {
-            selfkY = [UIScreen mainScreen].bounds.size.height - 215;
+            self.backgroundBtn.hidden = NO;
+            selfkY = AD_SCREEN.height - CONTENTHEIGHT;
+            if (AD_iPhoneX) {
+                selfkY -= 34.0f;
+            }
         }
         else {
-            selfkY = [UIScreen mainScreen].bounds.size.height;
+            self.backgroundBtn.hidden = YES;
+            selfkY = AD_SCREEN.height;
         }
-        self.frame = CGRectMake(0,selfkY, self.bounds.size.width,215);
-
+        self.titleBackgroundView.frame = CGRectMake(0,selfkY, self.bounds.size.width,TITLEHEIGHT);
+        self.addressPickerView.frame = CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, AD_SCREEN.width, CONTENTHEIGHT - TITLEHEIGHT);
+        if (AD_iPhoneX) {
+            self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
+        }
         [UIView commitAnimations];
     }];
 }

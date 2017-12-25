@@ -28,15 +28,16 @@
 
     self.view.backgroundColor = [UIColor lightGrayColor];
     
-    [self.view addSubview:self.pickerView];
     [self.view addSubview:self.addressBtn];
     [self.view addSubview:self.addressLabel];
+    [self.view addSubview:self.pickerView];
 }
 
 - (AddressPickerView *)pickerView{
     if (!_pickerView) {
-        _pickerView = [[AddressPickerView alloc]initWithFrame:CGRectMake(0, SCREEN.height , SCREEN.width, 215)];
+        _pickerView = [[AddressPickerView alloc]init];
         _pickerView.delegate = self;
+        [_pickerView setTitleHeight:50 pickerViewHeight:165];
         // 关闭默认支持打开上次的结果
 //        _pickerView.isAutoOpenLast = NO;
     }
