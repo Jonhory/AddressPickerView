@@ -2,7 +2,7 @@
 
 ![icon](https://raw.githubusercontent.com/JonHory/AddressPickerView/master/a1.png)
 
-### [Swift版本](https://github.com/Jonhory/AddressPickerViewForSwift)
+### [Swift版本传送门](https://github.com/Jonhory/AddressPickerViewForSwift)
 
 ## Contents
 * Getting Started
@@ -10,12 +10,8 @@
 * API
     * [address.txt](#address.txt)
     * [AddressPickerView.h](#AddressPickerView.h)
-    * [Province.h](#Province.h)
-    * [City.h](#City.h)
 * Examples
     * [Reference[参考]](#参考)
-* Attention
-    * [注意](#注意)
 
 
 ## <a id="如何使用"></a>如何使用
@@ -52,7 +48,7 @@
 
 
 
-## <a id="Province.h"></a>Province.h
+## <a id="Province.h"></a>AddressProvince
     @interface Province : NSObject
     @property (nonatomic, strong) NSString       * name;/**< 省名字*/
     @property (nonatomic, strong) NSArray        * cities;/**< 该省包含的所有城市名称*/
@@ -81,7 +77,7 @@
     + (instancetype)provinceWithName:(NSString *)name
                               cities:(NSArray *)cities;
 
-## <a id="City.h"></a>City.h
+## <a id="City.h"></a>AddressCity
     @property (nonatomic ,strong) NSString * cityName;/**< 城市名*/
 
     @property (nonatomic ,strong) NSArray  * areas;/**< 城市包含的所有地区*/
@@ -129,10 +125,6 @@
         }
         return _pickerView;
     }
-
-## <a id="注意"></a>注意
-* 使用的模型类名`Province、City`很常见，如果您的项目中有重名，请自行修改本项目中使用的类名，我不加前缀是因为我不喜欢- - 。
-
 
 
 ## <a id="关于我"></a>关于我

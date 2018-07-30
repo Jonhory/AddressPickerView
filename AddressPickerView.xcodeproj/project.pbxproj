@@ -15,8 +15,6 @@
 		89038F001D374628003AF953 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89038EFF1D374628003AF953 /* Assets.xcassets */; };
 		89038F031D374628003AF953 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 89038F011D374628003AF953 /* LaunchScreen.storyboard */; };
 		89038F111D374645003AF953 /* AddressPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 89038F0C1D374645003AF953 /* AddressPickerView.m */; };
-		89038F121D374645003AF953 /* City.m in Sources */ = {isa = PBXBuildFile; fileRef = 89038F0E1D374645003AF953 /* City.m */; };
-		89038F131D374645003AF953 /* Province.m in Sources */ = {isa = PBXBuildFile; fileRef = 89038F101D374645003AF953 /* Province.m */; };
 		89038F151D37464D003AF953 /* address.txt in Resources */ = {isa = PBXBuildFile; fileRef = 89038F141D37464D003AF953 /* address.txt */; };
 /* End PBXBuildFile section */
 
@@ -34,10 +32,6 @@
 		89038F041D374628003AF953 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		89038F0B1D374645003AF953 /* AddressPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressPickerView.h; sourceTree = "<group>"; };
 		89038F0C1D374645003AF953 /* AddressPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddressPickerView.m; sourceTree = "<group>"; };
-		89038F0D1D374645003AF953 /* City.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = City.h; sourceTree = "<group>"; };
-		89038F0E1D374645003AF953 /* City.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = City.m; sourceTree = "<group>"; };
-		89038F0F1D374645003AF953 /* Province.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Province.h; sourceTree = "<group>"; };
-		89038F101D374645003AF953 /* Province.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Province.m; sourceTree = "<group>"; };
 		89038F141D37464D003AF953 /* address.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = address.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -100,10 +94,6 @@
 				89038F141D37464D003AF953 /* address.txt */,
 				89038F0B1D374645003AF953 /* AddressPickerView.h */,
 				89038F0C1D374645003AF953 /* AddressPickerView.m */,
-				89038F0D1D374645003AF953 /* City.h */,
-				89038F0E1D374645003AF953 /* City.m */,
-				89038F0F1D374645003AF953 /* Province.h */,
-				89038F101D374645003AF953 /* Province.m */,
 			);
 			path = AddressPickerView;
 			sourceTree = "<group>";
@@ -181,9 +171,7 @@
 			files = (
 				89038EF81D374628003AF953 /* ViewController.m in Sources */,
 				89038EFE1D374628003AF953 /* AddressPickerView.xcdatamodeld in Sources */,
-				89038F121D374645003AF953 /* City.m in Sources */,
 				89038F111D374645003AF953 /* AddressPickerView.m in Sources */,
-				89038F131D374645003AF953 /* Province.m in Sources */,
 				89038EF51D374628003AF953 /* AppDelegate.m in Sources */,
 				89038EF21D374628003AF953 /* main.m in Sources */,
 			);

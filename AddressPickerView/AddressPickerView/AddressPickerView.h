@@ -8,6 +8,60 @@
 
 #import <UIKit/UIKit.h>
 
+@interface AddressCity : NSObject
+
+@property (nonatomic ,strong) NSString * cityName;/**< 城市名*/
+@property (nonatomic ,strong) NSArray  * areas;/**< 城市包含的所有地区*/
+/**
+ *  初始化城市
+ *
+ *  @param name  城市名字
+ *  @param areas 城市包含的地区
+ *
+ *  @return 初始化城市
+ */
+- (instancetype)initWithName:(NSString *)name
+                       areas:(NSArray *)areas;
+/**
+ *  初始化城市
+ *
+ *  @param cityName 城市名字
+ *  @param areas    城市包含的地区
+ *
+ *  @return 初始化城市
+ */
++ (instancetype)cityWithName:(NSString *)cityName
+                       areas:(NSArray *)areas;
+@end
+
+@interface AddressProvince : NSObject
+
+@property (nonatomic, strong) NSString       * name;/**< 省名字*/
+@property (nonatomic, strong) NSArray        * cities;/**< 该省包含的所有城市名称*/
+@property (nonatomic, strong) NSMutableArray * cityModels;/**< 该省包含的所有城市模型*/
+/**
+ *  初始化省份
+ *
+ *  @param name   省名字
+ *  @param cities 省包含的所有城市名字
+ *
+ *  @return 初始化省份
+ */
+- (instancetype)initWithName:(NSString *)name
+                      cities:(NSArray *)cities;
+/**
+ *  初始化省份
+ *
+ *  @param name   省名字
+ *  @param cities 省包含的所有城市名字
+ *
+ *  @return 初始化省份
+ */
++ (instancetype)provinceWithName:(NSString *)name
+                          cities:(NSArray *)cities;
+@end
+
+
 @protocol AddressPickerViewDelegate <NSObject>
 
 /** 取消按钮点击事件*/
