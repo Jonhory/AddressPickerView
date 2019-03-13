@@ -13,7 +13,7 @@
 #define AddressAreaIdxName @"AddressSelectArea"
 #define SELFSIZE self.bounds.size
 #define AD_SCREEN [UIScreen mainScreen].bounds.size
-#define AD_iPhoneX ([UIScreen mainScreen].bounds.size.width == 375.f && [UIScreen mainScreen].bounds.size.height == 812.f ? YES : NO)
+#define AD_iPhoneX ((([UIScreen mainScreen].bounds.size.width == 375.f && [UIScreen mainScreen].bounds.size.height == 812.f) || ([UIScreen mainScreen].bounds.size.width == 414.f && [UIScreen mainScreen].bounds.size.height == 896.f)) ? YES : NO)
 
 static CGFloat TITLEHEIGHT = 50.0;// 标题栏高度
 static CGFloat TITLEBUTTONWIDTH = 75.0;// 按钮宽度
@@ -58,10 +58,14 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 }
 @end
 
+@implementation AddressPickerViewModel
+
+@end
+
 
 @interface AddressPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
 
-@property(nonatomic, strong) UIButton *backgroundBtn;/**< 背景点击消失*/
+@property (nonatomic, strong) UIButton *backgroundBtn;/**< 背景点击消失*/
 
 @property (nonatomic ,strong) UIView   * titleBackgroundView;/**< 标题栏背景*/
 @property (nonatomic ,strong) UIButton * cancelBtn;/**< 取消按钮*/
@@ -76,7 +80,8 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 @property (nonatomic ,strong) NSDictionary   * citysDict;/**< 所有城市的字典*/
 @property (nonatomic ,strong) NSDictionary   * areasDict;/**< 所有地区的字典*/
 
-@property(nonatomic, strong) UIView *maskingView;
+@property (nonatomic, strong) UIView *maskingView;
+@property (nonatomic, strong) AddressPickerViewModel *model;
 
 @end
 @implementation AddressPickerView
@@ -92,15 +97,6 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
         // 默认支持自动打开上次结果
         self.isAutoOpenLast = YES;
         self.userInteractionEnabled = NO;
-    }
-    return self;
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        return [self initWithFrame:CGRectZero];
     }
     return self;
 }
@@ -158,7 +154,7 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 - (UIView *)maskingView {
     if (!_maskingView) {
         _maskingView = [[UIView alloc]initWithFrame:CGRectZero];
-        _maskingView.backgroundColor = self.addressPickerView.backgroundColor;
+        _maskingView.backgroundColor = _addressPickerView.backgroundColor;
     }
     return _maskingView;
 }
@@ -225,6 +221,13 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
     return _addressPickerView;
 }
 
+- (AddressPickerViewModel *)model {
+    if (!_model) {
+        _model = [[AddressPickerViewModel alloc]init];
+    }
+    return _model;
+}
+
 - (void)loadBackgroundBtn {
     [self addSubview:self.backgroundBtn];
 }
@@ -242,14 +245,17 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 }
 
 #pragma mark - 自动选择上次的结果
-- (void)setIsAutoOpenLast:(BOOL)isAutoOpenLast {
-    _isAutoOpenLast = isAutoOpenLast;
-    if (isAutoOpenLast) {
+- (void)handleIsAutoOpenLast {
+    if (_isAutoOpenLast) {
         __weak __typeof(self)weakSelf = self;
         [self getIdx:^(NSInteger p, NSInteger c, NSInteger a) {
+            weakSelf.model.selectedProvince = p;
             [weakSelf.addressPickerView selectRow:p inComponent:0 animated:NO];
+            [weakSelf.addressPickerView reloadComponent:1];
             [weakSelf.addressPickerView selectRow:c inComponent:1 animated:NO];
+            [weakSelf.addressPickerView reloadComponent:2];
             [weakSelf.addressPickerView selectRow:a inComponent:2 animated:NO];
+            
         }];
     } else {
         [self.addressPickerView selectRow:0 inComponent:0 animated:NO];
@@ -262,21 +268,15 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 - (void)loadAddressData{
     NSString * filePath = [[NSBundle mainBundle] pathForResource:@"address"
                                                           ofType:@"txt"];
-
     NSError  * error;
     NSString * str22 = [NSString stringWithContentsOfFile:filePath
                                                  encoding:NSUTF8StringEncoding
                                                     error:&error];
-    
-    if (error) {
-        return;
-    }
+    if (error) { return; }
     
     _dataDict = [self dictionaryWithJsonString:str22];
     
-    if (!_dataDict) {
-        return;
-    }
+    if (!_dataDict) { return; }
     
     _provincesArr = [_dataDict objectForKey:@"p"];
     _citysDict    = [_dataDict objectForKey:@"c"];
@@ -291,7 +291,6 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
                                                cities:citys];
         [_pArr addObject:p];
     }
-    
     //各个省份模型加载各自的所有城市模型
     for (AddressProvince * p in _pArr) {
         NSMutableArray * areasArr = [[NSMutableArray alloc]init];
@@ -312,12 +311,15 @@ static CGFloat CONTENTHEIGHT = 215.0;// 标题栏+选择视图高度
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView
 numberOfRowsInComponent:(NSInteger)component{
-    
     if (0 == component) {
         return _pArr.count;
     }
     else if (1 == component){
         NSInteger selectProvince = [pickerView selectedRowInComponent:0];
+        if (selectProvince != self.model.selectedProvince) {
+            AddressProvince  * p = _pArr[self.model.selectedProvince];
+            return p.cities.count;
+        }
         AddressProvince  * p            = _pArr[selectProvince];
         return p.cities.count;
     }
@@ -371,19 +373,18 @@ numberOfRowsInComponent:(NSInteger)component{
 - (void)pickerView:(UIPickerView *)pickerView
       didSelectRow:(NSInteger)row
        inComponent:(NSInteger)component{
+    
     if (0 == component) {
-        NSInteger selectCity = [pickerView selectedRowInComponent:1];
-        NSInteger selectArea = [pickerView selectedRowInComponent:2];
+        self.model.selectedProvince = row;
         [pickerView reloadComponent:1];
-        [pickerView selectRow:selectCity inComponent:1 animated:YES];
+        [pickerView selectRow:0 inComponent:1 animated:YES];
         [pickerView reloadComponent:2];
-        [pickerView selectRow:selectArea inComponent:2 animated:YES];
+        [pickerView selectRow:0 inComponent:2 animated:YES];
         
     }
     else if (1 == component){
-        NSInteger selectArea = [pickerView selectedRowInComponent:2];
         [pickerView reloadComponent:2];
-        [pickerView selectRow:selectArea inComponent:2 animated:YES];
+        [pickerView selectRow:0 inComponent:2 animated:YES];
     }
 }
 
@@ -445,6 +446,7 @@ numberOfRowsInComponent:(NSInteger)component{
 
 - (void)show {
     [self show:YES];
+    [self handleIsAutoOpenLast];
 }
 
 - (void)hide {
@@ -461,54 +463,38 @@ numberOfRowsInComponent:(NSInteger)component{
 
 - (void)showOrHide:(BOOL)isShow animation:(BOOL)animation{
     [self loadUI];
+    
     self.userInteractionEnabled = isShow;
     
     CGFloat selfY = self.frame.origin.y;
     if (!animation) {
-        if (isShow) {
-            self.backgroundBtn.hidden = NO;
-            selfY = AD_SCREEN.height - CONTENTHEIGHT - TITLEHEIGHT;
-            if (AD_iPhoneX) {
-                selfY -= 34.0f;
-            }
-        }
-        else {
-            self.backgroundBtn.hidden = YES;
-            selfY = AD_SCREEN.height;
-        }
-        self.titleBackgroundView.frame = CGRectMake(0,selfY, self.bounds.size.width,TITLEHEIGHT);
-        self.addressPickerView.frame = CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, AD_SCREEN.width, CONTENTHEIGHT - TITLEHEIGHT);
-        if (AD_iPhoneX) {
-            self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
-        }
+        [self reloadFrame:isShow y:selfY];
         return;
     }
     __block CGFloat selfkY = selfY;
     [UIView animateWithDuration:0.5 animations:^{
-        
-        [UIView beginAnimations:@"move" context:nil];
-        [UIView setAnimationDuration:0.75];
-        [UIView setAnimationDelegate:self];
         //改变它的frame的x,y的值
-        
-        if (isShow) {
-            self.backgroundBtn.hidden = NO;
-            selfkY = AD_SCREEN.height - CONTENTHEIGHT;
-            if (AD_iPhoneX) {
-                selfkY -= 34.0f;
-            }
-        }
-        else {
-            self.backgroundBtn.hidden = YES;
-            selfkY = AD_SCREEN.height;
-        }
-        self.titleBackgroundView.frame = CGRectMake(0,selfkY, self.bounds.size.width,TITLEHEIGHT);
-        self.addressPickerView.frame = CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, AD_SCREEN.width, CONTENTHEIGHT - TITLEHEIGHT);
-        if (AD_iPhoneX) {
-            self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
-        }
-        [UIView commitAnimations];
+        [self reloadFrame:isShow y:selfkY];
     }];
+}
+
+- (void)reloadFrame:(BOOL)isShow y:(CGFloat)selfY {
+    if (isShow) {
+        self.backgroundBtn.hidden = NO;
+        selfY = AD_SCREEN.height - CONTENTHEIGHT;
+        if (AD_iPhoneX) { selfY -= 34.0f; }
+    }
+    else {
+        self.backgroundBtn.hidden = YES;
+        selfY = AD_SCREEN.height;
+    }
+    
+    self.titleBackgroundView.frame = CGRectMake(0,selfY, self.bounds.size.width,TITLEHEIGHT);
+    self.addressPickerView.frame = CGRectMake(0, self.titleBackgroundView.frame.origin.y + TITLEHEIGHT, AD_SCREEN.width, CONTENTHEIGHT - TITLEHEIGHT);
+    if (AD_iPhoneX) {
+        self.maskingView.frame = CGRectMake(0, self.addressPickerView.frame.origin.y + self.addressPickerView.frame.size.height, AD_SCREEN.width, 34);
+    }
+    
 }
 
 - (void)sureBtnClicked{
@@ -529,7 +515,7 @@ numberOfRowsInComponent:(NSInteger)component{
             selectArea = c.areas.count - 1;
         }
         
-        if (self.isAutoOpenLast) {
+        if (_isAutoOpenLast) {
             [self setProvinceIdx:selectProvince cityIdx:selectCity areaIdx:selectArea];
         }
         
@@ -550,7 +536,6 @@ typedef void(^lastIdxBlock)(NSInteger p, NSInteger c, NSInteger a);
     NSNumber *p = [[NSUserDefaults standardUserDefaults] valueForKey:AddressProvinceIdxName];
     NSNumber *c = [[NSUserDefaults standardUserDefaults] valueForKey:AddressCityIdxName];
     NSNumber *a = [[NSUserDefaults standardUserDefaults] valueForKey:AddressAreaIdxName];
-    
     if (p.integerValue && c.integerValue && a.integerValue) {
         block(p.integerValue - 1, c.integerValue - 1, a.integerValue - 1);
     }

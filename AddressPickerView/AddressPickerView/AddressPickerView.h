@@ -61,6 +61,11 @@
                           cities:(NSArray *)cities;
 @end
 
+@interface AddressPickerViewModel : NSObject
+
+@property(nonatomic, assign) NSInteger selectedProvince;
+
+@end
 
 @protocol AddressPickerViewDelegate <NSObject>
 

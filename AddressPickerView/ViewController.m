@@ -23,6 +23,12 @@
 
 @implementation ViewController
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.addressBtn.selected = YES;
+    [self.pickerView show];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
